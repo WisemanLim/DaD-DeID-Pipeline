@@ -1,0 +1,11 @@
+{
+  "_note": "KSIC 대분류 → 도메인 오버레이 매핑 스텁. PRD WFP + KSIC/ISIC/NACE/NAICS. 시드 24 도메인 룰번들 연결 키.",
+  "sections": {
+    "C": { "title": "제조", "domain": "manufacturing", "naics": "31-33", "seed_examples": ["manufacturing-electronics", "manufacturing-chemical"] },
+    "K": { "title": "금융·보험", "domain": "finance", "naics": "52", "seed_examples": ["finance-banking"] },
+    "Q": { "title": "보건·의료", "domain": "healthcare", "naics": "62", "seed_examples": ["healthcare-clinical"] },
+    "O": { "title": "공공행정", "domain": "govtech", "naics": "92", "seed_examples": ["public-administration"] },
+    "R": { "title": "예술·스포츠·여가", "domain": "media-gaming", "naics": "71", "seed_examples": ["arts-recreation"] },
+    "J": { "title": "정보통신", "domain": "ict-saas", "naics": "51", "baseline": true }
+  }
+}

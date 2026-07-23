@@ -1,0 +1,7 @@
+# honcho 멀티프로세스 (host direct-mode) / dev: uvx honcho -f Procfile.dev start
+# 주의: honcho 는 all-or-nothing — 한 프로세스가 종료하면 전체에 SIGTERM.
+#       → 항상 살아있는(listen) 자체완결 python 서비스만 기본에 둔다.
+# portal/bff(pnpm 워크스페이스 앱)는 `make run-web` 로 분리 실행(스텁 완성 후).
+deid: uv run --directory services/deid uvicorn app.main:app --reload --port 8001
+rag:  uv run --directory services/rag uvicorn app.main:app --reload --port 8002
+# worker: cd services/worker && go run ./cmd/server   # OCR/재색인 워커(선택)

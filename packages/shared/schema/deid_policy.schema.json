@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://redactflow/schema/deid_policy.json",
+  "title": "DeidentificationPolicy (md pack §3)",
+  "type": "object",
+  "required": ["policy_id", "version", "industry", "classification", "rules"],
+  "properties": {
+    "policy_id": { "type": "string" },
+    "version": { "type": "string" },
+    "industry": {
+      "type": "object",
+      "properties": {
+        "ksic_section": { "type": "string", "description": "C/K/Q/O/R/J ..." },
+        "domain": { "type": "string" },
+        "subdomain": { "type": "string" }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "properties": {
+        "default_level": { "type": "string", "enum": ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"] },
+        "trade_secret_enabled": { "type": "boolean" },
+        "allowed_use": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["SEARCH", "RAG", "FINE_TUNING", "ANALYTICS", "EXPORT"] }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field_type": { "type": "string" },
+          "detection": {
+            "type": "object",
+            "properties": {
+              "regex": { "type": "string" },
+              "ner_label": { "type": "string" },
+              "dictionary": { "type": "string" }
+            }
+          },
+          "action": { "type": "string" },
+          "replacement": { "type": "string" },
+          "applies_to": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["TEXT", "TABLE", "OCR", "IMAGE_CAPTION", "METADATA"] }
+          },
+          "fine_tuning_allowed": { "type": "boolean" }
+        }
+      }
+    },
+    "risk_model": {
+      "type": "object",
+      "properties": {
+        "base_risk": { "type": "number" },
+        "reidentification_review": {
+          "type": "object",
+          "properties": {
+            "required": { "type": "boolean" },
+            "frequency": { "type": "string" },
+            "threshold_score": { "type": "number" }
+          }
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "properties": {
+        "log_input_hash": { "type": "boolean" },
+        "store_transform_map": { "type": "boolean" },
+        "approval_required_for_export": { "type": "boolean" },
+        "langfuse_trace_tags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

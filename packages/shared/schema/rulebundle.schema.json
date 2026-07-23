@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://redactflow/schema/rulebundle.json",
+  "title": "DaD DeID Pipeline Rule (seed 실측 스키마 / PRD §7)",
+  "description": ".docs/seed/*.json 룰번들 단일 룰. 베이스라인=global+privacy, 오버레이=업종(C/K/Q/O/R).",
+  "type": "object",
+  "required": ["ruleId", "domain", "category", "patternType", "action", "severity", "priority", "enabled", "version"],
+  "properties": {
+    "ruleId": { "type": "string" },
+    "domain": { "type": "string", "description": "global | privacy | <업종 서브도메인>" },
+    "locale": { "type": "string", "enum": ["ko-KR", "en", "both"] },
+    "ioType": { "type": "string", "enum": ["input", "output", "both"] },
+    "category": { "type": "string", "enum": ["pii", "credentials", "financial", "sensitive", "ip", "safety", "compliance", "fraud"] },
+    "subCategory": { "type": "string" },
+    "description": { "type": "string" },
+    "patternType": { "type": "string", "enum": ["regex", "regex+classifier", "ner", "dictionary"] },
+    "patterns": {
+      "type": "object",
+      "properties": {
+        "regex": { "type": "array", "items": { "type": "string" } },
+        "luhnCheck": { "type": "boolean" }
+      }
+    },
+    "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "priority": { "type": "integer", "minimum": 0, "maximum": 999 },
+    "action": {
+      "type": "string",
+      "description": "비식별: REMOVE/MASK/TOKENIZE/GENERALIZE/RANGE_BUCKET/HASH · 가드레일: block/redact/block_or_redact/block_or_pseudonymize/warn/refuse/add_disclaimer/sanitize/aggregate_only"
+    },
+    "messageTemplate": {
+      "type": "object",
+      "properties": { "ko-KR": { "type": "string" }, "en": { "type": "string" } }
+    },
+    "regulationTags": { "type": "array", "items": { "type": "string" } },
+    "examplesPositive": { "type": "array", "items": { "type": "string" } },
+    "examplesNegative": { "type": "array", "items": { "type": "string" } },
+    "enabled": { "type": "boolean" },
+    "version": { "type": "string" }
+  }
+}

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>deid-guideline-simulator</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{--bg:#f7f6f2;--surface:#fbfbf8;--surface2:#f0ede8;--text:#23211c;--muted:#6f6d67;--primary:#01696f;--blue:#006494;--warn:#9a4d17;--error:#a12c7b;--success:#437a22;--border:#d7d2ca;--shadow:0 10px 30px rgba(0,0,0,.08);--r:18px;--font:'Satoshi',sans-serif}
+    [data-theme="dark"]{--bg:#161513;--surface:#1d1b18;--surface2:#26231f;--text:#ece8e1;--muted:#aaa59d;--primary:#4f98a3;--blue:#6ba6db;--warn:#d48a57;--error:#d574b5;--success:#82ba5d;--border:#3b3833;--shadow:0 10px 30px rgba(0,0,0,.35)}
+    *{box-sizing:border-box;margin:0;padding:0} html,body{height:100%} body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55}
+    a{color:var(--primary)} button,select,input,textarea{font:inherit}
+    .wrap{max-width:1400px;margin:0 auto;padding:24px}
+    .top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}
+    .top h1{font-size:clamp(1.7rem,1.1rem + 2vw,3rem);line-height:1.05}
+    .top p{color:var(--muted);max-width:70ch;margin-top:8px}
+    .theme{border:1px solid var(--border);background:var(--surface);padding:12px 16px;border-radius:999px;cursor:pointer}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:20px}
+    .panel,.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+    .panel{padding:20px;position:sticky;top:20px;height:fit-content}
+    .panel h2,.card h2{font-size:1rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+    .field{margin-bottom:16px}
+    label{display:block;font-size:.92rem;font-weight:700;margin-bottom:8px}
+    select,textarea{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:12px;padding:12px}
+    textarea{min-height:180px;resize:vertical}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{padding:12px 16px;border-radius:12px;border:1px solid var(--border);cursor:pointer;background:var(--surface2);color:var(--text)}
+    .btn.primary{background:var(--primary);color:white;border-color:transparent}
+    .content{display:grid;gap:20px}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .stat{padding:18px}.stat .v{font-size:2rem;font-weight:700}.stat .k{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .card{padding:20px}
+    table{width:100%;border-collapse:collapse;font-size:.94rem}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+    th{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.78rem;font-weight:700}
+    .high{background:rgba(161,44,123,.12);color:var(--error)} .mid{background:rgba(154,77,23,.12);color:var(--warn)} .low{background:rgba(67,122,34,.12);color:var(--success)}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface2);padding:2px 6px;border-radius:8px;color:var(--blue)}
+    .result{white-space:pre-wrap;background:var(--surface2);border:1px solid var(--border);padding:16px;border-radius:14px;min-height:220px}
+    .checklist li{margin-left:18px;margin-bottom:8px}
+    .note{font-size:.92rem;color:var(--muted)}
+    @media (max-width: 1100px){.grid{grid-template-columns:1fr}.panel{position:static}.stats,.two{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>금융/의료/제조 데이터 비식별 가이드라인 비교 시뮬레이터</h1>
+      <p>업종별 법적 준수 사항, 민감 데이터 식별 규칙, 비식별 조치 체크리스트를 한 화면에서 비교하고 샘플 문서에 대한 변환 예시를 확인하는 정적 시뮬레이터입니다.</p>
+    </div>
+    <button class="theme" id="themeBtn">테마 전환</button>
+  </div>
+
+  <div class="grid">
+    <aside class="panel">
+      <h2>시뮬레이션 입력</h2>
+      <div class="field">
+        <label for="industry">업종</label>
+        <select id="industry">
+          <option value="finance">금융</option>
+          <option value="health">의료</option>
+          <option value="manufacturing">제조</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="docType">문서 유형</label>
+        <select id="docType">
+          <option value="report">보고서</option>
+          <option value="contract">계약/동의서</option>
+          <option value="record">기록/원장</option>
+          <option value="manual">운영/공정 문서</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sample">샘플 텍스트</label>
+        <textarea id="sample">홍길동 환자의 주민등록번호는 900101-1234567이며, 차트번호는 PT-9912입니다. 2026-05-20 검사 결과 HbA1c는 8.1%로 기록되었습니다. 스프 A의 배합비율은 정제수 62.5%, 향신료 17.3%, 첨가제 4.8%입니다. 고객 계좌번호는 123-45-678901, 카드번호는 5123-4567-8910-1112입니다.</textarea>
+      </div>
+      <div class="btns">
+        <button class="btn primary" id="runBtn">시뮬레이션 실행</button>
+        <button class="btn" id="presetBtn">업종별 예시 로드</button>
+      </div>
+      <p class="note" style="margin-top:12px">이 시뮬레이터는 법률 자문이 아니라 설계용 비교 도구이며, 실제 준수 판단에는 내부 법무·컴플라이언스 검토가 필요합니다.</p>
+    </aside>
+
+    <section class="content">
+      <div class="stats">
+        <div class="card stat"><div class="k">민감 패턴 검출</div><div class="v" id="detectedCount">0</div><div class="note">식별자/민감값 후보 수</div></div>
+        <div class="card stat"><div class="k">변환 적용 수</div><div class="v" id="transformedCount">0</div><div class="note">마스킹/치환된 항목 수</div></div>
+        <div class="card stat"><div class="k">추정 변환율</div><div class="v" id="transformRate">0%</div><div class="note">민감값 기준</div></div>
+        <div class="card stat"><div class="k">위험 등급</div><div class="v" id="riskLevel">-</div><div class="note">업종별 기본 위험도</div></div>
+      </div>
+
+      <div class="two">
+        <div class="card">
+          <h2>법적·관리적 체크리스트</h2>
+          <ul class="checklist" id="legalChecklist"></ul>
+        </div>
+        <div class="card">
+          <h2>기술 적용 체크리스트</h2>
+          <ul class="checklist" id="techChecklist"></ul>
+        </div>
+      </div>
+
+      <div class="two">
+        <div class="card">
+          <h2>원문</h2>
+          <div class="result" id="originalText"></div>
+        </div>
+        <div class="card">
+          <h2>비식별 결과</h2>
+          <div class="result" id="maskedText"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>업종별 비교 매트릭스</h2>
+        <table>
+          <thead><tr><th>업종</th><th>주요 민감 데이터</th><th>주요 준수 포인트</th><th>대표 비식별 조치</th><th>추천 통제</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>금융 <span class="badge high">High</span></td>
+              <td>계좌번호, 카드번호, 거래내역, 고객식별정보</td>
+              <td>가명정보 처리 가이드라인 준수, 재식별 금지, 목적 외 이용 제한</td>
+              <td>부분 마스킹, 토큰화, 총계처리, 범주화</td>
+              <td>토큰 vault, 접근 로그, 외부 LLM 반출 차단</td>
+            </tr>
+            <tr>
+              <td>의료 <span class="badge high">High</span></td>
+              <td>환자식별자, 진단/처방, 검사값, 유전체, PHI</td>
+              <td>보건의료 데이터 가이드라인, 의료법 적용 검토, 적정성 평가</td>
+              <td>가명처리, 일반화, k-익명성, 직접식별자 제거</td>
+              <td>재식별 키 분리, 결합 제한, 사용 목적 통제</td>
+            </tr>
+            <tr>
+              <td>제조 <span class="badge mid">Medium-High</span></td>
+              <td>배합비율, BOM, 설비 파라미터, 공정조건, 도면</td>
+              <td>개인정보보다 영업비밀/산업기술 보호 중심, 외부 공유 최소화</td>
+              <td>recipe token화, 범위화, 세부 수치 비공개화</td>
+              <td>문서 등급분류, 권한 기반 열람, 대외 반출 통제</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>근거 메모</h2>
+        <p class="note">비식별화 가이드라인은 가명처리, 총계처리, 데이터 삭제, 범주화, 마스킹 등의 기법을 단독 또는 복합적으로 사용하고, 재식별 위험을 정기적으로 모니터링할 것을 요구합니다. 의료 데이터는 별도 가이드라인과 의료법적 검토가 중요하며, 제조 데이터는 개인정보 외에 배합비율·공정값 같은 영업비밀형 데이터 보호를 별도 모델로 다루는 것이 적절합니다.</p>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+const presets = {
+  finance: {
+    risk: 'High',
+    legal: [
+      '가명정보 처리 목적과 범위를 문서화한다.',
+      '재식별 금지 및 재식별 시 즉시 보고 절차를 둔다.',
+      '제3자 제공/외부 모델 전송 여부를 별도 승인한다.',
+      '거래 데이터 결합 시 추가 위험평가를 수행한다.'
+    ],
+    tech: [
+      '계좌번호·카드번호 정규식 검출과 부분 마스킹을 적용한다.',
+      '고객 식별키는 token vault로 치환한다.',
+      'RAG 인덱스에는 가명화된 문서만 적재한다.',
+      '질의·응답·검색 문서를 감사 로그로 보존한다.'
+    ],
+    sample: '고객 홍길동의 계좌번호는 123-45-678901이며 카드번호는 5123-4567-8910-1112입니다. 2026년 5월 거래금액은 12,450,000원입니다.'
+  },
+  health: {
+    risk: 'High',
+    legal: [
+      '보건의료 데이터 활용 목적과 법적 근거를 명확히 한다.',
+      '직접식별자 제거 후 적정성 평가 절차를 거친다.',
+      '재식별 키는 분리 저장하고 접근권한을 제한한다.',
+      '의료데이터와 비의료데이터 결합 시 별도 심사를 수행한다.'
+    ],
+    tech: [
+      '환자명·주민번호·차트번호·연락처를 우선 제거한다.',
+      '검사일시는 필요한 경우 범주화하거나 시계열 단위로 일반화한다.',
+      'PHI/진단명 문맥 검출을 위해 NER 모델과 룰 기반 탐지를 병행한다.',
+      '학습 데이터에는 de-id corpus 또는 합성 데이터를 우선 사용한다.'
+    ],
+    sample: '홍길동 환자의 주민등록번호는 900101-1234567이며 차트번호는 PT-9912입니다. 2026-05-20 검사 결과 HbA1c는 8.1%입니다.'
+  },
+  manufacturing: {
+    risk: 'Medium-High',
+    legal: [
+      '문서가 개인정보인지 영업비밀인지 우선 분류한다.',
+      '외부 협력사 제공 범위와 계약상 비밀유지 의무를 확인한다.',
+      '산업기술/영업비밀 반출 승인 절차를 운영한다.',
+      '설비·배합·도면 데이터는 최소권한 원칙으로 접근 통제한다.'
+    ],
+    tech: [
+      '배합비율·BOM·설비 파라미터를 엔티티로 식별한다.',
+      '정밀 수치는 범위값 또는 recipe token으로 치환한다.',
+      '도면/공정 문서는 워터마킹과 반출 로그를 남긴다.',
+      'RAG 응답에서 절대값 노출을 차단하는 후처리 필터를 둔다.'
+    ],
+    sample: '스프 A의 배합비율은 정제수 62.5%, 향신료 17.3%, 첨가제 4.8%입니다. 반응기 온도는 182.4도, 압력은 6.7bar입니다.'
+  }
+};
+
+function deidentify(text, industry){
+  let detected = 0, transformed = 0;
+  let out = text;
+  const rules = [];
+  const pushRule = (regex, replaceFn) => { out = out.replace(regex, (...args) => { detected++; transformed++; return replaceFn(...args); }); };
+
+  pushRule(/\b\d{6}-\d{7}\b/g, ()=>'[주민번호_가명처리]');
+  pushRule(/\b(?:\d{3}-\d{2}-\d{6}|\d{3}-\d{3,4}-\d{4})\b/g, (m)=> m.includes('-45-') ? '[계좌번호_마스킹]' : '[전화번호_마스킹]');
+  pushRule(/\b\d{4}-\d{4}-\d{4}-\d{4}\b/g, ()=>'[카드번호_마스킹]');
+  pushRule(/\bPT-\d+\b/g, ()=>'[차트번호_가명처리]');
+  pushRule(/홍길동/g, ()=>'[이름_가명처리]');
+
+  if(industry === 'health'){
+    pushRule(/\b\d{4}-\d{2}-\d{2}\b/g, ()=>'[검사일_일반화]');
+    pushRule(/\bHbA1c는\s*([\d.]+%)\b/g, ()=> 'HbA1c는 [검사값_범주화]');
+  }
+  if(industry === 'finance'){
+    pushRule(/\b[\d,]+원\b/g, ()=> '[거래금액_범주화]');
+  }
+  if(industry === 'manufacturing'){
+    pushRule(/\b\d+(?:\.\d+)?%\b/g, ()=> '[배합비율_RANGE]');
+    pushRule(/\b\d+(?:\.\d+)?도\b/g, ()=> '[온도_RANGE]');
+    pushRule(/\b\d+(?:\.\d+)?bar\b/g, ()=> '[압력_RANGE]');
+  }
+  return {out, detected, transformed};
+}
+
+function render(){
+  const industry = document.getElementById('industry').value;
+  const text = document.getElementById('sample').value;
+  const config = presets[industry];
+  const result = deidentify(text, industry);
+  document.getElementById('originalText').textContent = text;
+  document.getElementById('maskedText').textContent = result.out;
+  document.getElementById('detectedCount').textContent = result.detected;
+  document.getElementById('transformedCount').textContent = result.transformed;
+  document.getElementById('transformRate').textContent = (result.detected ? Math.round((result.transformed/result.detected)*100) : 0) + '%';
+  document.getElementById('riskLevel').textContent = config.risk;
+  document.getElementById('legalChecklist').innerHTML = config.legal.map(v=>`<li>${v}</li>`).join('');
+  document.getElementById('techChecklist').innerHTML = config.tech.map(v=>`<li>${v}</li>`).join('');
+}
+
+document.getElementById('runBtn').addEventListener('click', render);
+document.getElementById('presetBtn').addEventListener('click', ()=>{
+  const industry = document.getElementById('industry').value;
+  document.getElementById('sample').value = presets[industry].sample;
+  render();
+});
+document.getElementById('industry').addEventListener('change', ()=>{
+  document.getElementById('sample').value = presets[document.getElementById('industry').value].sample;
+  render();
+});
+let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('themeBtn').addEventListener('click', ()=>{theme = theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', theme);});
+render();
+</script>
+</body>
+</html>

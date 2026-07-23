@@ -1,0 +1,35 @@
+[project]
+name = "redactflow-rag"
+version = "0.1.0"
+description = "DaD DeID Pipeline 분리 인덱싱 + 검색 / sensitivity-separated indexing + retrieval"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    "sqlalchemy>=2.0",
+    # RAG orchestration (PRD §6): LangChain 또는 LlamaIndex
+    "langchain>=0.3",
+    "pgvector>=0.3",          # pgvector 백엔드
+    # qdrant-client / weaviate-client 는 벡터 어댑터 전환 시 추가
+    # 관측/평가
+    "langfuse>=2.50",
+    "psycopg[binary]>=3.3.4",
+    "qdrant-client>=1.18.0",
+    "sentence-transformers>=5.5.1",
+    "weaviate-client>=4.21.3",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "httpx>=0.27", "ruff>=0.7", "ragas>=0.2"]
+
+[tool.pytest.ini_options]
+markers = ["ragas: RAG groundedness/recall/MRR eval cases"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

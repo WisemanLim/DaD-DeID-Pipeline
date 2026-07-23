@@ -1,0 +1,90 @@
+# ===== common / 공통 =====
+.env
+.env.*
+!.env.example
+*.local
+*.pem
+*.key
+secrets.*
+.secrets/
+*.log
+logs/
+tmp/
+.tmp/
+*.pid
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+*.swp
+*.swo
+*~
+.DS_Store
+# test 원본 로그 비커밋 / raw test logs
+test/**/logs/
+
+# ===== Node / TypeScript =====
+node_modules/
+.pnp.*
+dist/
+build/
+out/
+.next/
+.turbo/
+.vite/
+coverage/
+.eslintcache
+pnpm-debug.log*
+.pnpm-store/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.uv-cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.so
+local.db
+
+# ===== Go =====
+bin/
+*.exe
+*.test
+*.out
+vendor/
+go.work.sum
+
+# ===== platform / 플랫폼 (macOS·Windows·Linux) =====
+# --- macOS ---
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon?
+# --- Windows ---
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+# --- Linux ---
+.directory
+.Trash-*
+.nfs*
+.fuse_hidden*
+
+.omc
